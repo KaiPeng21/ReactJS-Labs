@@ -1,0 +1,191 @@
+// ===== Data Structure =====
+
+// Data Structure for storing vehicle info
+class VRow {
+    constructor(year, model, price, link) {
+        this.year = year;
+        this.model = model;
+        this.price = price;
+        this.link = link;
+    }
+};
+
+// Data Structure for stroring a vehicle table
+class VTable {
+    constructor(vehicleType, vrowArr){
+        this.vehicleType = vehicleType;
+        this.vrowArr = vrowArr;
+    }
+};
+
+// ===== Data Sets =====
+
+// Testing Data
+const cars = [new VRow(2013, "A", 32000, "#"),
+              new VRow(2011, "B", 4400, "#"),
+              new VRow(2016, "B", 15500, "#")];
+const trucks = [new VRow(2013, "D", 18000, "#"),
+              new VRow(2013, "E", 5200, "#")];
+const convertibles = [new VRow(2013, "E", 2000, "#"),
+              new VRow(2013, "G", 6000, "#"),
+              new VRow(2013, "H", 12500, "#"),
+              new VRow(2013, "M", 50000, "#")];
+
+const data = [new VTable('Car', cars),
+             new VTable('Trucks', trucks),
+             new VTable('Convertibles', convertibles)];
+
+// ===== React Components =====
+
+// Buynow
+// This creates the "Buy Now" pushbutton
+// props: 
+// - link (a link to the vehicle info page)
+function Buynow(props){
+  return <a href={props.link} class="btn btn-info">Buy Now</a>
+}
+
+// VehicleHead
+// This creates the vehicle table head component
+// props: 
+// - (none)
+function VehicleHead(props){
+  return <thead><tr><th>Year</th><th>Model</th><th>Price</th><th>Buy</th></tr></thead>
+}
+
+// VehicleRow
+// This creates the vehicle table data row component
+// props:
+// - vrow (a VRow Object)
+function VehicleRow(props){
+  return <tr><td>{props.vrow.year}</td><td>{props.vrow.model}</td><td>${props.vrow.price}</td><td><Buynow link={props.vrow.link}/></td></tr>
+}
+
+// VehicleBody
+// This creates the vehicle table body (data rows) component
+// props:
+// bodyArr (array of VRow Objects)
+function VehicleBody(props){
+  var body = []
+  for (var i = 0; i < props.bodyArr.length; i++){
+    var row = <VehicleRow vrow={props.bodyArr[i]} />
+    body.push(row)
+  }
+  return <tbody>{body}</tbody>
+}
+
+// VehicleTable
+// This creates a complete vehicle table
+// props:
+// vehicleType
+// bodyArr (array of VRow Objects)
+function VehicleTable(props){
+  var id = props.vehicleType;
+  
+  return (<div class="container" id={id}><table class="table table-sm table-fixed">
+      <caption>{props.vehicleType}</caption>
+      <VehicleHead />
+      <VehicleBody bodyArr={props.bodyArr}/>
+    </table></div>)
+}
+
+// VehicleTables
+// This creates many vehicle table (for car, truck, convertibles...)
+// props:
+// - data (array of VRow Table Objects)
+function VehicleTables(props){
+  var tables = []
+  
+  for (var i = 0; i < props.data.length; i++){
+    var table = <VehicleTable vehicleType={props.data[i].vehicleType} bodyArr={props.data[i].vrowArr} />
+    
+    tables.push(table)
+  }
+  
+  return <div>{tables}</div>
+}
+
+// Welcome Block
+// Create the welcome message at the top
+// props: (none)
+function Welcome(props){
+  return (<div class="container">
+      <h1>Welcome to React Transportation</h1>
+      <p>The best place to buy vehicles online</p>
+    </div>)
+}
+
+// Selection List
+// Create a selection list for the select type input
+// props:
+// - optionList (array of options)
+function SelectionList(props){
+  var options = [<option value="All">All</option>];
+  for (var i = 0; i < props.optionList.length; i++){
+    var val = props.optionList[i];
+    options.push(<option value={val}>{val}</option>);
+  }
+  return <select class="form-control" id="sel_cars">{options}</select>
+}
+
+// Option Form
+// create the check box and the selection list
+// props:
+// - data (array of VRow Table Objects)
+function OptionForm(props){
+  var optionList = props.data.map(x => x.vehicleType);
+  
+  return (<div class="container">
+    <h2>Choose Options</h2> 
+    <div class="checkbox" id="cb_new_only">
+        <label><input type="checkbox" value=""/> New Only</label>
+    </div>
+    <div class="form-group">
+        <label for="sel_cars">Select Type</label>
+        <SelectionList optionList={optionList} />
+    </div>
+  </div>)
+}
+
+function ReactVehicleApp(){
+  return (<div class="container">
+    <Welcome />
+    <OptionForm data={data}/>
+    <VehicleTables data={data}/>
+      </div>
+  )
+}    
+
+ReactDOM.render(
+  <ReactVehicleApp />,
+  document.getElementById("root")
+)
+
+
+// === JQuery for Select Type ====
+
+var types = data.map(x => x.vehicleType)
+
+$(document).ready(function(){
+    $("#sel_cars").click(function(){
+      var sel = document.getElementById("sel_cars");
+      var selectedID = sel.options[sel.selectedIndex].text;
+      
+      console.log(types);
+      
+      if (selectedID == 'All'){
+        for (var i = 0; i < types.length; i++){
+          $("#" + types[i]).fadeIn();
+        }
+      } else {
+        for (var i = 0; i < types.length; i++){
+          if (types[i] == selectedID){
+            $("#" + types[i]).fadeIn();
+          } else {
+            $("#" + types[i]).fadeOut();
+          }
+        }
+      }
+      
+    });
+});

@@ -1,0 +1,49 @@
+body{
+  background-color: #f0f5f5;
+}
+
+.table-fixed {
+    height: 250px;
+    background-color: #f3f3f3;
+}
+
+table {
+    display: flex;
+    flex-flow: column;
+    height: 100%;
+    width: 100%;
+}
+
+table thead {
+    flex: 0 0 auto;
+    width: calc(100% - 0.9em);
+    background-color: #17a2b8;
+    color: #f3f3f3;
+}
+
+table tbody {
+    flex: 1 1 auto;
+    display: block;
+    overflow-y: scroll;
+}
+table tbody tr {
+    width: 100%;
+}
+
+table thead, table tbody tr {
+    display: table;
+    table-layout: fixed;
+}
+
+caption{
+  font-size: 35px;
+}
+
+.form-control{
+  width:25%;
+}
+
+#root{
+  margin-top: 50px;
+  margin-bottom: 50px;
+}
