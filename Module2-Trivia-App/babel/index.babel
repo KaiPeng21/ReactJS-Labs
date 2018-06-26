@@ -1,0 +1,146 @@
+// Question
+// the question text component
+// props:
+// - value1: multiplicand in the question
+// - value2: multiplier in the question
+class Question extends React.Component{
+   render(){
+     return (<center>
+         <h1 className="question">What is {this.props.value1} x {this.props.value2} ?</h1>
+       </center>)
+   }
+}
+
+// Button
+// multiple choice button
+// props:
+// - id: the button id number
+// - clickHandle: button click event handler
+// - value: value of this 
+class Button extends React.Component{
+  render(){
+    return (<button className="btn btn-info option" onClick={() => this.props.clickHandle(this.props.id)}>
+        {this.props.value}
+      </button>)
+  }
+}
+
+// ButtonGroup
+// group of Buttons
+// props:
+// - options: array of possible answer
+// - clickHandle: button click event handler
+class ButtonGroup extends React.Component{
+  render(){
+    var buttons = []
+    for (var i = 0; i < 4; i++){
+      buttons.push(<Button id={i} value={this.props.options[i]} clickHandle={this.props.clickHandle}/>);
+    }
+    
+    return (
+      <center><div className="btn-group-vertical">{buttons}</div></center>
+    )
+  }
+}
+
+// Counter
+// props:
+// - name: name of the counter (correct or incorrect)
+// - value: counter value
+class Counter extends React.Component{
+  constructor(props){
+    super(props)
+  }
+  
+  render(){
+    return <center><h2 className="counter">{this.props.name}: {this.props.value}</h2></center>
+  }
+} 
+
+// Trivia App
+// props: none
+// state:
+// - value1: value used in multiplication question
+// - value2: value used in multiplication question
+// - answer: answer to value1 * value2
+// - answerOption: the button id given the correct answer
+// - options: possible multiple choices
+// - correctCount: counting the number of correct answers
+// - incorrectCount: counting the number of incorrect answers
+class App extends React.Component{
+  constructor(props){
+    super(props)
+    
+    var value1 = Math.floor(Math.random() * 10 + 1)
+    var value2 = Math.floor(Math.random() * 10 + 1)
+    var answer = value1 * value2
+    var answerOption = Math.floor(Math.random() * 4)
+    var options = [answer, answer, answer, answer]
+    for (var i = 0; i < 4; i++){
+        if (i != answerOption){
+            while (options[i] == answer){
+              options[i] = Math.floor(Math.random() * 10 + 1) * Math.floor(Math.random() * 10 + 1)
+            }
+        }
+    }
+    
+    this.state = {
+      value1 : value1, 
+      value2: value2,
+      options: options,
+      answer: answer,
+      answerOption: answerOption,
+      correctCount: 0,
+      incorrectCount: 0
+    }
+    
+    this.clickHandle = this.clickHandle.bind(this);
+  }
+  
+  clickHandle(id){
+    // determine if the click is correct
+    var correct = (id === this.state.answerOption)
+    
+    // generate new question and options
+    var value1 = Math.floor(Math.random() * 10 + 1)
+    var value2 = Math.floor(Math.random() * 10 + 1)
+    var answer = value1 * value2
+    var answerOption = Math.floor(Math.random() * 4)
+    var options = [answer, answer, answer, answer]
+    for (var i = 0; i < 4; i++){
+        if (i != answerOption){
+            while (options[i] == answer){
+              options[i] = Math.floor(Math.random() * 10 + 1) * Math.floor(Math.random() * 10 + 1)
+            }
+        }
+    }
+    
+    // update state
+    this.setState((prevState, props) => { return {
+      value1 : value1, 
+      value2: value2,
+      options: options,
+      answer: answer,
+      answerOption: answerOption,
+      correctCount: correct ? prevState.correctCount + 1 : prevState.correctCount,
+      incorrectCount: correct ? prevState.incorrectCount : prevState.incorrectCount + 1
+    }})
+  }
+  
+  render(){
+    
+    return (<div className="container">
+      <Question value1={this.state.value1} value2={this.state.value2}/>
+      <ButtonGroup options={this.state.options} clickHandle={this.clickHandle}/>
+      <Counter name="Correct" value={this.state.correctCount} />
+      <Counter name="Incorrect" value={this.state.incorrectCount} />
+      </div>
+    )
+  }
+}
+
+
+ReactDOM.render(
+  <App/>,
+  document.getElementById("root")
+)
