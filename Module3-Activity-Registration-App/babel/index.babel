@@ -1,0 +1,346 @@
+var activities = [
+  "Science Lab", "Swimming", "Cooking", "Painting"
+]
+
+var restrictions = [
+  {code: "a", content: "Dietary Restriction"},
+  {code: "b", content: "Physical Disabilities"},
+  {code: "c", content: "Medical Needs"}
+]
+
+// props:
+// - id
+// - title
+// - value
+// - handle
+class InputField extends React.Component{
+  constructor(props){
+    super(props)
+  }
+  
+  render(){
+    return (<div className="form-group">
+        <label htmlFor={this.props.id}>{this.props.title}:</label>
+        <input 
+          type="text" 
+          className="form-control" 
+          id={this.props.id} 
+          placeholder={'Enter ' + this.props.title}
+          value={this.props.value} 
+          onChange={this.props.handle}/>
+      </div>)
+  }
+}
+
+// props:
+// - id
+// - title
+// - optionList
+// - value
+// - handle
+class SelectInput extends React.Component{
+  constructor(props){
+    super(props)
+  }
+  
+  render(){
+    return (<div className="form-group">
+      <label htmlFor={this.props.id}>{this.props.title}:</label>
+      <select 
+        className="form-control" 
+        id={this.props.id}
+        value={this.props.value}
+        onChange={this.props.handle}>
+        {this.props.optionList.map( 
+          (item, ind) => <option key={ind} value={item}>{item}</option>
+        )}
+      </select>
+    </div>)
+  }
+}
+
+// props:
+// - id
+// - code
+// - checkname
+// - checked
+// - handle
+class CheckBox extends React.Component{
+  render(){
+    return (<div className="form-check">
+        <label className="form-check-label">
+          <input 
+            id={this.props.id}
+            type="checkbox" 
+            className="form-check-input" 
+            code={this.props.code}
+            checked={this.props.checked}
+            onChange={this.props.handle}
+          /> 
+          {this.props.checkname}
+        </label>
+      </div>)
+  }
+}
+
+// props:
+// - id
+// - description
+// - checkList
+// - value
+// - handle
+class CheckBoxes extends React.Component{
+  constructor(props){
+    super(props)
+  }
+  
+  render(){
+    return (<div id={this.props.id}>
+        <label htmlFor={this.props.id}>
+          {this.props.description}
+        </label>
+        {this.props.checkList.map( 
+          (item, ind) => 
+          <CheckBox 
+            key={ind} 
+            id={ind}
+            checkname={item.code + ') ' + item.content}
+            checked={this.props.value[ind]}
+            code={item.code}
+            handle={this.props.handle}
+          /> 
+        )}
+      </div>)
+  }
+}
+
+// props:
+// - handle
+class SubmitButton extends React.Component{
+  render(){
+    var style={
+      'marginTop' : '20px',
+      'marginBottom' : '20px'
+    }
+    
+    return <button 
+             style={style} 
+             className="btn btn-info" 
+             onClick={() => this.props.handle()}>
+            Add
+    </button>
+  }
+}
+
+// props
+// - handle
+// - rowid
+class RemoveButton extends React.Component{
+  render(){
+    return (<button 
+             className="btn btn-warning"
+             data-rowid={this.props.rowid}
+             onClick={this.props.handle}>
+             delete
+    </button>)
+  }
+}
+
+class ResultTableHead extends React.Component{
+  render(){
+    return (<thead><tr>
+            <th>Remove</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Activity</th>
+            <th>Restrictions</th>
+        </tr>
+      </thead>)
+  }
+}
+
+class ResultTableRow extends React.Component{
+  render(){
+    return (<tr id={this.props.id}>
+                <td><RemoveButton 
+                      rowid={this.props.id}
+                      handle={this.props.handle}/></td>
+                <td>{this.props.firstname}</td>
+                <td>{this.props.lastname}</td>
+                <td>{this.props.activity}</td>
+                <td>{this.props.restrictions}</td>
+      </tr>)
+  }
+}
+
+class ResultTableBody extends React.Component{
+  render(){
+    return (<tbody>
+        {this.props.resultList.map(
+          (item, ind) => <ResultTableRow key={ind} 
+                             id={item.id} 
+                             firstname={item.firstname} 
+                             lastname={item.lastname} 
+                             activity={item.activity} 
+                             restrictions={item.restrictions}
+                             handle={() => {this.props.handle(ind)}}/>
+        )}
+    </tbody>)
+  }
+}
+
+class ResultTable extends React.Component{
+  render(){
+    var style = {
+      'backgroundcolor' : '#f3f3f3',
+      'margintop': '20px'
+    }
+    
+    return (<table style={style} className="table table-bordered">
+        <ResultTableHead />
+        <ResultTableBody 
+          resultList={this.props.resultList}
+          handle={this.props.handle}/>
+      </table>)
+  }
+} 
+
+class App extends React.Component{
+  
+  constructor(props){
+    super(props)
+    
+    this.state = {
+      nextPID : 0,
+      resultList: [],
+      codeMap: restrictions.map((items, ind) => {return items.code}),
+      firstname: '',
+      lastname: '',
+      activity: activities[0],
+      restrictions: restrictions.map((items, ind) => {return false}) 
+    }
+    
+    this.firstnameChangeHandle = this.firstnameChangeHandle.bind(this)
+    this.lastnameChangeHandle = this.lastnameChangeHandle.bind(this)
+    this.activityChangeHandle = this.activityChangeHandle.bind(this)
+    this.restrictionChangeHandle = this.restrictionChangeHandle.bind(this)
+    this.addResultHandle = this.addResultHandle.bind(this)
+    this.removeResultHandle = this.removeResultHandle.bind(this)
+  }
+  
+  firstnameChangeHandle(event){
+    this.setState(
+      {firstname: event.target.value}
+    )
+  }
+  
+  lastnameChangeHandle(event){
+    this.setState(
+      {lastname: event.target.value}
+    )
+  }
+  
+  activityChangeHandle(event){
+    this.setState(
+      {activity: event.target.value}
+    )
+  }
+  
+  restrictionChangeHandle(event){
+    
+    var cid = event.target.id
+    var checked = event.target.checked
+    
+    this.setState((prevState, props) =>{
+      
+      var nextRestrictions = prevState.restrictions.slice()
+      nextRestrictions[cid] = checked
+      return {
+        restrictions : nextRestrictions
+      }
+    })
+    
+  }
+  
+  addResultHandle(){
+    this.setState((prevState, props) => {
+      var resultListCopy = this.state.resultList.slice()
+      
+      var restrictionsContent = []
+      for (var i = 0; i < this.state.restrictions.length; i++){
+        if (this.state.restrictions[i]){
+          restrictionsContent.push(this.state.codeMap[i])
+        }
+      }
+      restrictionsContent = restrictionsContent.join(', ')
+      
+      resultListCopy.push({
+        id : this.state.nextPID,
+        firstname : this.state.firstname,
+        lastname : this.state.lastname,
+        activity : this.state.activity,
+        restrictions : restrictionsContent
+      })
+      
+      return {
+        nextPID : prevState.nextPID + 1,
+        resultList : resultListCopy,
+        firstname: '',
+        lastname: '',
+        activity: activities[0],
+        restrictions: restrictions.map((items, ind) => {return false}) 
+      }
+    })
+    
+  }
+  
+  removeResultHandle(index){
+    
+    var updatedResultList = this.state.resultList.slice()
+    updatedResultList.splice(index, 1)
+    
+    this.setState({
+      resultList : updatedResultList
+    })
+  }
+  
+  render(){
+    return (<div className="container">
+        <h1>Activity Registration</h1>
+        <InputField 
+          id="firstname"
+          title="First Name"
+          value={this.state.firstname}
+          handle={this.firstnameChangeHandle}/>
+        <InputField 
+          id="lastname"
+          title="Last Name"
+          value={this.state.lastname}
+          handle={this.lastnameChangeHandle}/>
+        <SelectInput 
+          id="activity"
+          title="Activity"
+          value={this.state.activity}
+          handle={this.activityChangeHandle}
+          optionList={activities}
+          />
+        <CheckBoxes 
+          id="restriction"
+          description="Check all apply:"
+          value={this.state.restrictions}
+          handle={this.restrictionChangeHandle}
+          checkList={restrictions}
+          />
+        <SubmitButton handle={this.addResultHandle}/>
+        <ResultTable 
+          resultList={this.state.resultList} 
+          handle={this.removeResultHandle}
+          />
+    </div>)
+  }
+}
+
+ReactDOM.render(
+    <App/>,
+    document.getElementById("root")
+)
